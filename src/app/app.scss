@@ -22,17 +22,16 @@
   text-decoration: none;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--c-gold);
-  color: var(--c-ink);
-  font-weight: 800;
-  font-size: 18px;
+.brand-logo {
+  display: block;
+  width: 164px;
+  max-width: 100%;
+  height: 28px;
+  object-fit: contain;
+  object-position: left center;
 }
+
+.brand-logo-light-bg { display: none; }
 
 .brand-text {
   display: flex;
@@ -60,11 +59,13 @@
 
 :host:has(app-admin-daily-activity) .app-main { max-width: 1440px; }
 :host:has(app-admin-daily-activity) .app-header { background: #f3f0ff; color: #2c2154; }
-:host:has(app-admin-daily-activity) .brand-mark { background: #705cc8; color: #fff; }
+:host:has(app-admin-daily-activity) .brand-logo-dark-bg { display: none; }
+:host:has(app-admin-daily-activity) .brand-logo-light-bg { display: block; }
 :host:has(app-admin-daily-activity) .app-footer { background: #55438f; color: #f4f1ff; }
 :host:has(app-admin-auth) .app-main { max-width: 1440px; }
 :host:has(app-admin-auth) .app-header { background: #f3f0ff; color: #2c2154; }
-:host:has(app-admin-auth) .brand-mark { background: #705cc8; color: #fff; }
+:host:has(app-admin-auth) .brand-logo-dark-bg { display: none; }
+:host:has(app-admin-auth) .brand-logo-light-bg { display: block; }
 :host:has(app-admin-auth) .app-footer { background: #55438f; color: #f4f1ff; }
 
 .app-footer {
