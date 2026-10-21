@@ -19,7 +19,7 @@ export const CAMPAIGN_CONFIG = new InjectionToken<CampaignConfig>('CAMPAIGN_CONF
   factory: () => ({
     campaignId: environment.campaignId,
     title: 'V FEST',
-    retailerName: 'Partner Store',
+    retailerName: 'Contest',
     qualifyingModels: ['Y11', 'Y21'],
     contestDays: 'Monday to Sunday',
     rewardTiers: [500, 1000, 2000, 8000],
