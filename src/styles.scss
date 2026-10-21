@@ -1,0 +1,172 @@
+/* ---------- Design tokens (swap for retailer branding) ---------- */
+:root {
+  --c-ink: #102a43;
+  --c-ink-2: #1d4e6f;
+  --c-gold: #f4b41a;
+  --c-gold-2: #ffe08a;
+  --c-bg: #f4f7f6;
+  --c-surface: #ffffff;
+  --c-text: #173042;
+  --c-muted: #627481;
+  --c-border: #d9e3e5;
+  --c-primary: #087f8c;
+  --c-primary-press: #06636d;
+  --c-error: #b3261e;
+  --c-error-bg: #fdecea;
+  --c-success: #1e7d45;
+  --c-success-bg: #e6f5ec;
+  --radius: 16px;
+  --shadow: 0 2px 4px rgb(16 42 67 / 5%), 0 12px 30px rgb(16 42 67 / 8%);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 12% 0%, #ffffff 0 18%, transparent 42%), var(--c-bg);
+  color: var(--c-text);
+  font: 16px/1.5 'Avenir Next', Avenir, 'Trebuchet MS', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { line-height: 1.12; margin: 0 0 8px; }
+h1, h2 { font-family: Georgia, 'Times New Roman', serif; }
+h1 { font-size: 30px; letter-spacing: 0; }
+h2 { font-size: 20px; }
+p { margin: 0 0 12px; }
+a { color: var(--c-primary); }
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  z-index: 100;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 8px;
+  &:focus { left: 8px; }
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Surfaces ---------- */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.stack > * + * { margin-top: 16px; }
+
+.eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-primary);
+  margin-bottom: 6px;
+}
+
+.muted { color: var(--c-muted); }
+.small { font-size: 14px; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 17px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.05s, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active:not(:disabled) { transform: translateY(1px); }
+  &:focus-visible { outline: 3px solid var(--c-gold); outline-offset: 2px; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.btn-primary {
+  background: var(--c-primary);
+  color: #fff;
+  &:hover:not(:disabled) { background: var(--c-primary-press); }
+}
+
+.btn-gold {
+  background: var(--c-gold);
+  color: var(--c-ink);
+  &:hover:not(:disabled) { background: var(--c-gold-2); }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-primary);
+  border: 1.5px solid var(--c-border);
+}
+
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--c-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Alerts ---------- */
+.alert {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  border: 1px solid transparent;
+  p:last-child { margin-bottom: 0; }
+}
+.alert-error { background: var(--c-error-bg); color: var(--c-error); border-color: #f5c6c2; }
+.alert-info { background: #e5f4f2; color: #12606a; border-color: #bde1dc; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Keep focused/scrolled-to fields clear of the sticky header */
+input, button, [id] { scroll-margin-top: 88px; }

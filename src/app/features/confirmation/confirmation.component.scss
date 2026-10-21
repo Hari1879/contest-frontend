@@ -1,0 +1,49 @@
+:host { display: block; }
+:host > * + * { margin-top: 16px; }
+
+.intro { text-align: center; }
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 4px auto 12px;
+  border-radius: 50%;
+  background: var(--c-success-bg);
+  color: var(--c-success);
+  font-size: 28px;
+  font-weight: 900;
+
+  &.win { background: var(--c-gold); color: var(--c-ink); }
+}
+
+.receipt dl { margin: 0; }
+.receipt dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--c-border);
+  &:first-child { padding-top: 0; }
+  &:last-child { border-bottom: 0; padding-bottom: 0; }
+}
+dt { color: var(--c-muted); font-size: 14px; }
+dd { margin: 0; text-align: right; font-weight: 600; }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+.win-text { color: var(--c-success); }
+
+.ref { display: flex; align-items: center; gap: 8px; }
+.copy {
+  border: 1px solid var(--c-border);
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--c-primary);
+  cursor: pointer;
+}
+
+.next p:last-child { margin: 0; }
+.tip { text-align: center; }

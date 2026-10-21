@@ -1,0 +1,62 @@
+@let o = outcome();
+<header class="intro">
+  <div class="badge" [class.win]="o.kind === 'won'" aria-hidden="true">
+    @if (o.kind === 'won') { ₹ } @else { ✓ }
+  </div>
+  <h1>
+    @if (o.kind === 'won') { You won {{ o.amount | inr }} } @else { Entry recorded }
+  </h1>
+  <p class="muted">
+    @if (o.kind === 'won') {
+      Save this receipt — you may need the reference number to claim your reward.
+    } @else {
+      Your entry has been recorded. This card didn't win a reward.
+    }
+  </p>
+</header>
+
+<section class="card receipt" aria-label="Entry receipt">
+  <dl>
+    <div>
+      <dt>Result</dt>
+      <dd>
+        @if (o.kind === 'won') { <strong class="win-text">{{ o.amount | inr }} reward</strong> } @else { No reward }
+      </dd>
+    </div>
+    <div>
+      <dt>IMEI</dt>
+      <dd class="mono">{{ completed().maskedImei }}</dd>
+    </div>
+    <div>
+      <dt>Reference ID</dt>
+      <dd class="ref">
+        @if (o.referenceId) {
+          <span class="mono">{{ o.referenceId }}</span>
+          <button type="button" class="copy" (click)="copyRef(o.referenceId)">
+            {{ copied() ? 'Copied' : 'Copy' }}
+          </button>
+        } @else {
+          <span class="mono">—</span>
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>Submitted</dt>
+      <dd>{{ completed().submittedAt | date: 'd MMM y, h:mm a' }}</dd>
+    </div>
+  </dl>
+</section>
+
+@if (o.kind === 'won') {
+  <section class="card next">
+    <h2>What happens next</h2>
+    <p>Your payment link is prepared and checked directly in this app. You do not need to wait for an SMS or email.</p>
+  </section>
+} @else if (o.message) {
+  <section class="card next"><p>{{ o.message }}</p></section>
+}
+
+<span class="visually-hidden" aria-live="polite">{{ copied() ? 'Reference ID copied' : '' }}</span>
+
+<p class="muted small tip">Tip: take a screenshot of this page for your records.</p>
+<button type="button" class="btn btn-ghost" (click)="done()">Done</button>

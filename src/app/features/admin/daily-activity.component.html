@@ -1,0 +1,205 @@
+<section class="admin-page" aria-labelledby="activity-title">
+  <div class="admin-topline">
+    <div class="workspace-mark"><span>CA</span><strong>CONTEST / ADMIN</strong></div>
+    <div class="topline-actions">
+      <div class="access-state"><i aria-hidden="true"></i> RESTRICTED WORKSPACE</div>
+      <button type="button" class="admin-logout" (click)="logout()" [disabled]="loggingOut()">
+        {{ loggingOut() ? 'SIGNING OUT' : 'LOG OUT' }}
+      </button>
+    </div>
+  </div>
+
+  <header class="page-heading">
+    <div class="heading-copy">
+      <span class="eyebrow">OPERATIONS / DAILY REGISTER</span>
+      <h1 id="activity-title">Contest <em>activity</em></h1>
+      <p>Participant records, outcomes, and payout activity.</p>
+    </div>
+    <form class="key-form" [class.custom-range]="period() === 'custom'" (submit)="applyFilters($event)">
+      <label>
+        <span>PERIOD</span>
+        <select [value]="period()" (change)="setPeriod($event)">
+          <option value="">All dates</option>
+          <option value="last7days">Last 7 days</option>
+          <option value="custom">Custom range</option>
+        </select>
+      </label>
+      @if (period() === 'custom') {
+        <label>
+          <span>FROM DATE</span>
+          <input type="date" [value]="fromDate()" (input)="setFromDate($event)" />
+        </label>
+        <label>
+          <span>TO DATE</span>
+          <input type="date" [value]="toDate()" (input)="setToDate($event)" />
+        </label>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">
+        <span>{{ loading() ? 'Loading' : 'Apply filters' }}</span>
+        <span class="refresh-mark" aria-hidden="true">↻</span>
+      </button>
+    </form>
+    <div class="advanced-toggle-row">
+      <button
+        type="button"
+        class="advanced-toggle"
+        [attr.aria-expanded]="filtersExpanded()"
+        aria-controls="advanced-activity-filters"
+        (click)="toggleAdvancedFilters()"
+      >
+        <span>{{ filtersExpanded() ? 'Hide filters' : 'More filters' }}</span>
+        @if (advancedFilterCount()) { <b>{{ advancedFilterCount() }} active</b> }
+        <span class="toggle-icon" aria-hidden="true">{{ filtersExpanded() ? '−' : '+' }}</span>
+      </button>
+    </div>
+    @if (filtersExpanded()) {
+      <div class="advanced-filters" id="advanced-activity-filters">
+        <label>
+          <span>ENTRY STATUS</span>
+          <select [value]="entryStatus()" (change)="setEntryStatus($event)">
+            <option value="">All statuses</option>
+            <option value="won">Won</option>
+            <option value="not_won">Not won</option>
+            <option value="duplicate">Duplicate</option>
+            <option value="rejected">Rejected</option>
+            <option value="campaign_closed">Campaign closed</option>
+            <option value="model_not_eligible">Model not eligible</option>
+          </select>
+        </label>
+        <label>
+          <span>MODEL</span>
+          <select [value]="model()" (change)="setModel($event)">
+            <option value="">All models</option>
+            <option value="Y21">Y21</option>
+            <option value="V70FE">V70FE</option>
+            <option value="X300FE">X300FE</option>
+          </select>
+        </label>
+        <label>
+          <span>AMOUNT</span>
+          <select [value]="amount()" (change)="setAmount($event)">
+            <option value="">Any amount</option>
+            <option value="500">₹500</option>
+            <option value="1000">₹1,000</option>
+            <option value="2000">₹2,000</option>
+            <option value="8000">₹8,000</option>
+          </select>
+        </label>
+        <label>
+          <span>TIER</span>
+          <select [value]="tier()" (change)="setTier($event)">
+            <option value="">All tiers</option>
+            <option value="FIRST">First</option>
+            <option value="SECOND">Second</option>
+            <option value="THIRD">Third</option>
+            <option value="PREMIUM">Premium</option>
+          </select>
+        </label>
+        <label>
+          <span>PAYOUT STATUS</span>
+          <select [value]="payoutStatus()" (change)="setPayoutStatus($event)">
+            <option value="">All payout statuses</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="paid">Paid</option>
+            <option value="failed">Failed</option>
+            <option value="expired">Expired</option>
+          </select>
+        </label>
+      </div>
+    }
+    @if (filterError()) { <p class="filter-error" role="alert">{{ filterError() }}</p> }
+  </header>
+
+  <div class="metrics" aria-label="Activity summary">
+    <article class="metric metric-ink">
+      <div><span>PARTICIPANTS</span><b>01</b></div>
+      <strong>{{ participants().length }}</strong>
+      <small>Records on this page</small>
+    </article>
+    <article class="metric metric-lime">
+      <div><span>WINNERS</span><b>02</b></div>
+      <strong>{{ winnerCount() }}</strong>
+      <small>Winning entries</small>
+    </article>
+    <article class="metric metric-blue">
+      <div><span>TRANSACTIONS</span><b>03</b></div>
+      <strong>{{ transactions().length }}</strong>
+      <small>Payment events</small>
+    </article>
+    <article class="metric metric-coral">
+      <div><span>SUCCESSFUL PAYOUTS</span><b>04</b></div>
+      <strong>{{ successfulPayouts().length }}</strong>
+      <small>Confirmed payouts</small>
+    </article>
+  </div>
+
+  <section class="data-section" aria-label="Contest data">
+    <header class="data-heading">
+      <div>
+        <span class="eyebrow">REGISTER VIEW</span>
+        <h2>{{ tabLabel(activeTab()) }}</h2>
+      </div>
+      <div class="page-total">
+        @if (total() !== null) { {{ total() }} <span>total records</span> }
+        @else { PAGE {{ page() }} <span>/ 50 ROWS</span> }
+      </div>
+    </header>
+
+    <nav class="activity-tabs" role="tablist" aria-label="Activity type">
+      @for (tab of tabs; track tab) {
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="activeTab() === tab"
+          [class.active]="activeTab() === tab"
+          (click)="selectTab(tab)"
+        >
+          {{ tabLabel(tab) }}
+          <span>{{ tabCount(tab) }}</span>
+        </button>
+      }
+    </nav>
+
+    @if (error()) {
+      <div class="state-message error" role="alert">
+        <div><span class="state-kicker">REQUEST FAILED</span><p>{{ error() }}</p></div>
+        <button type="button" class="btn btn-ghost" (click)="refresh()">Try again</button>
+      </div>
+    } @else if (loading() && !loaded()) {
+      <div class="state-message" role="status"><span class="spinner" aria-hidden="true"></span> Loading register…</div>
+    } @else if (!loading() && loaded() && rows().length === 0) {
+      <div class="state-message empty-state">
+        <span class="empty-index">00</span>
+        <div><strong>No {{ tabLabel(activeTab()).toLowerCase() }} found</strong><p>There are no records in this view yet.</p></div>
+      </div>
+    } @else if (rows().length > 0) {
+      <div class="table-meta"><span>{{ rows().length }} ROWS</span><span>PAGE {{ page() }}</span></div>
+      <div class="table-scroll" role="region" [attr.aria-label]="tabLabel(activeTab())" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              @for (column of columns(); track column) {
+                <th scope="col">{{ labelFor(column) }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track $index) {
+              <tr>
+                @for (column of columns(); track column) {
+                  <td>{{ display(row[column]) }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <nav class="pagination" aria-label="Activity pages">
+        <button type="button" class="btn btn-ghost" (click)="previousPage()" [disabled]="page() <= 1 || loading()">Previous</button>
+        <span>PAGE <strong>{{ page() }}</strong></span>
+        <button type="button" class="btn btn-ghost" (click)="nextPage()" [disabled]="!hasNext() || loading()">Next</button>
+      </nav>
+    }
+  </section>
+</section>

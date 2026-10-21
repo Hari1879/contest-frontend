@@ -1,0 +1,167 @@
+<header class="intro">
+  <span class="eyebrow">Step 2 of 2</span>
+  <h1>
+    @if (!revealedNow()) {
+      {{ completed().firstName }}, your result is ready!
+    } @else if (won()) {
+      Congratulations, {{ completed().firstName }}!
+    } @else {
+      Thanks for entering, {{ completed().firstName }}
+    }
+  </h1>
+  <p class="muted">
+    @if (!revealedNow()) {
+      Your entry is accepted. Tap the button below to reveal your result.
+    } @else if (won()) {
+      Your reward is confirmed.
+    } @else {
+      This entry didn't win, but thank you for shopping with us.
+    }
+  </p>
+</header>
+
+<div class="card-wrap">
+  @if (!revealedNow()) {
+    <div class="reveal-prompt" role="status" aria-live="polite">
+      <span>Your result is ready</span>
+    </div>
+  } @else {
+    @if (won()) {
+      <div class="prize-won" [class.premium]="premium()">
+        <span class="label">@if (premium()) { PREMIUM REWARD } @else { You won }</span>
+        <span class="amount">{{ amount() | inr }}</span>
+        <span class="sub">cash reward</span>
+      </div>
+    } @else {
+      <div class="prize-none">
+        <span class="emoji" aria-hidden="true">🍀</span>
+        <span class="amount-sm">Better luck next time</span>
+      </div>
+    }
+  }
+
+  @if (revealedNow() && won()) {
+    <div class="confetti" aria-hidden="true">
+      @for (i of confetti; track i) {
+        <i [style.--i]="i"></i>
+      }
+    </div>
+    <div class="coin-pour" aria-hidden="true">
+      @for (coin of coins; track coin.id) {
+        <span
+          class="pour-coin"
+          [style.left.%]="coin.left"
+          [style.animation-delay.ms]="coin.delay"
+          [style.animation-duration.s]="coin.duration"
+          [style.--drift]="coin.drift + 'px'"
+        ></span>
+      }
+    </div>
+  }
+</div>
+
+@if (!revealedNow()) {
+  <button type="button" class="btn btn-primary reveal-result" (click)="onRevealed()">
+    <span>Reveal my result</span>
+    <span class="reveal-arrow" aria-hidden="true">→</span>
+  </button>
+}
+
+@if (revealedNow()) {
+  @if (!claimPanel()) {
+    <button type="button" class="btn btn-primary continue" (click)="continue()">
+      @if (won()) { Claim my reward } @else { View my receipt }
+    </button>
+  }
+}
+
+@if (showWinDialog()) {
+  <div class="win-backdrop">
+    <section class="win-dialog" role="dialog" aria-modal="true" aria-labelledby="win-dialog-title">
+      <span class="win-dialog-badge" aria-hidden="true">&#10003;</span>
+      <h2 id="win-dialog-title">Congratulations, you won {{ amount() | inr }}!</h2>
+      <p>Your reward is being prepared. Close this message to check for your claim link; you’ll open it in a new tab when it’s ready.</p>
+      <button type="button" class="btn btn-primary" (click)="closeWinDialog()">Got it</button>
+    </section>
+  </div>
+}
+
+@if (claimPanel()) {
+  <section class="claim-panel" aria-labelledby="claim-title">
+    <h2 id="claim-title">
+      @if (claimPhase() === 'paid') { Payment successful }
+      @else if (claimPhase() === 'expired') { Payout link expired }
+      @else { Payout for {{ amount() | inr }} reward }
+    </h2>
+
+    @if (claimPhase() === 'pending') {
+      <p role="status" aria-live="polite">Preparing your claim link. This page checks automatically.</p>
+    } @else if (claimPhase() === 'link_ready' || claimPhase() === 'failed') {
+      @if (claimPhase() === 'failed') {
+        <p class="claim-error" role="status" aria-live="polite">The payout didn’t complete. You can try claiming again.</p>
+      } @else {
+        <p role="status" aria-live="polite">Your reward is ready to claim.</p>
+      }
+      <button type="button" class="btn btn-primary claim-button" (click)="claimPayout()">
+        Claim {{ amount() | inr }}
+      </button>
+    } @else if (claimPhase() === 'awaiting_payment') {
+      <p role="status" aria-live="polite">Complete the verification in the new tab. This page updates automatically.</p>
+      @if (showFallbackLink() && payoutUrl()) {
+        <p class="payout-note">Your browser blocked the new tab. Open the secure payout page here:</p>
+        <a class="btn btn-primary payout-link" [href]="payoutUrl()" target="_blank" rel="noopener noreferrer">
+          Continue to claim {{ amount() | inr }}
+        </a>
+      }
+      <button
+        type="button"
+        class="btn btn-ghost check-button"
+        [disabled]="checking() || checkCooldown()"
+        (click)="checkNow()"
+      >
+        I've finished - check now
+      </button>
+    } @else if (claimPhase() === 'processing') {
+      <p role="status" aria-live="polite">Payment in progress</p>
+      <button
+        type="button"
+        class="btn btn-ghost check-button"
+        [disabled]="checking() || checkCooldown()"
+        (click)="checkNow()"
+      >
+        I've finished - check now
+      </button>
+    } @else if (claimPhase() === 'paid') {
+      <p class="claim-success" role="status" aria-live="polite">Your payout has been confirmed.</p>
+      <button type="button" class="btn btn-primary" (click)="finishClaim()">Done</button>
+    } @else if (claimPhase() === 'expired') {
+      <p role="status" aria-live="polite">This payout link has expired.</p>
+      @if (canRequestNewLink()) {
+        <button type="button" class="btn btn-primary" [disabled]="requestingNewLink()" (click)="requestNewLink()">
+          @if (requestingNewLink()) { Requesting a new link… } @else { Get a new link }
+        </button>
+      } @else {
+        <p class="claim-note">Please contact the store for help.</p>
+      }
+    } @else if (claimPhase() === 'network_error') {
+      <p class="claim-error" role="alert">{{ claimError() }}</p>
+      <button type="button" class="btn btn-ghost" (click)="retryStatus()">Retry</button>
+    } @else if (claimPhase() === 'still_waiting') {
+      <p role="status" aria-live="polite">
+        @if (awaitingPaymentStatus()) { Still waiting for confirmation. } @else { Still waiting for your claim link. }
+      </p>
+      <button
+        type="button"
+        class="btn btn-ghost check-button"
+        [disabled]="checking() || checkCooldown()"
+        (click)="checkNow()"
+      >
+        Check now
+      </button>
+    }
+
+    @if (checking()) { <span class="visually-hidden" role="status">Checking payout status</span> }
+  </section>
+}
+
+<div class="visually-hidden" aria-live="polite" aria-atomic="true">{{ announcement() }}</div>

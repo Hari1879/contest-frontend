@@ -1,0 +1,87 @@
+<section class="card" [attr.aria-labelledby]="'pool-h-' + code()">
+  <h2 [id]="'pool-h-' + code()">
+    {{ code() }} pool
+    <span class="muted small">{{ pool().sharePct }}% · Rs {{ fmt(totals().poolAmount) }}</span>
+  </h2>
+  @if (errors().get('pool.' + code()); as e) {
+    <p class="a-err" role="alert">{{ e }}</p>
+  }
+  <div class="a-scroll">
+    <table class="a-table">
+      <caption class="visually-hidden">
+        {{ code() }} rewards and winner counts by tier and day
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col" class="l">Tier</th>
+          <th scope="col">Reward (Rs)</th>
+          @for (d of days; track d) {
+            <th scope="col" [class.a-locked]="lock(d) === 'past'">
+              Day {{ d + 1 }}<br /><small>{{ label(d) }}</small>
+              @if (lock(d) === 'past' && today()) {
+                <svg class="a-lock" width="12" height="12" viewBox="0 0 24 24" role="img" aria-label="Locked: day has passed">
+                  <path fill="currentColor" d="M17 9V7a5 5 0 0 0-10 0v2H5v13h14V9h-2zm-8 0V7a3 3 0 0 1 6 0v2H9z" />
+                </svg>
+              }
+            </th>
+          }
+          <th scope="col">Winner Count</th>
+          <th scope="col">Total (Rs.)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tier of pool().tiers; track tier.tierNo; let t = $index) {
+          <tr>
+            <th scope="row" class="l">{{ tier.label }}</th>
+            <td>
+              <input
+                class="a-input a-yellow"
+                inputmode="numeric"
+                [value]="tier.amount"
+                [readOnly]="!editable()"
+                [attr.aria-label]="code() + ' ' + tier.label + ' reward amount in rupees'"
+                [attr.aria-invalid]="amountErr(t) ? 'true' : null"
+                (input)="onAmount($event, t)"
+              />
+              @if (amountErr(t); as e) {
+                <div class="a-err" role="alert">{{ e }}</div>
+              }
+            </td>
+            @for (d of days; track d) {
+              <td class="a-cell" [class.a-locked]="readOnly(d)" [title]="statusTitle(t, d)">
+                <input
+                  class="a-input"
+                  inputmode="numeric"
+                  [value]="tier.dayCounts[d]"
+                  [readOnly]="readOnly(d)"
+                  [attr.aria-label]="cellLabel(t, d)"
+                  [attr.aria-invalid]="countErr(t, d) ? 'true' : null"
+                  (input)="onCount($event, t, d)"
+                  (paste)="onPaste($event, t, d)"
+                />
+                @if (lock(d) === 'today') {
+                  <small>claimed: {{ row(t, d)?.claimed ?? 0 }}</small>
+                }
+                @if (countErr(t, d); as e) {
+                  <div class="a-err" role="alert">{{ e }}</div>
+                }
+              </td>
+            }
+            <td>{{ fmt(totals().tierWinners[t]) }}</td>
+            <td>{{ fmt(totals().tierTotals[t]) }}</td>
+          </tr>
+        }
+        <tr>
+          <th scope="row" class="l">Winners per day</th>
+          <td></td>
+          @for (d of days; track d) {
+            <td>{{ fmt(totals().dayWinners[d]) }}</td>
+          }
+          <td>{{ fmt(totals().winners) }}</td>
+          <td>{{ fmt(totals().total) }}</td>
+        </tr>
+        <tr appCheckRow [check]="totals().check" [colspan]="days.length + 3"></tr>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,123 @@
+:host { display: block; }
+
+.back {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.intro { margin-bottom: 16px; }
+
+form { display: flex; flex-direction: column; gap: 18px; }
+
+.confirm-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+
+  h2, p { margin: 0; }
+  h2 { font-size: 21px; }
+}
+
+.formatted-imei {
+  padding: 14px;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  background: var(--c-surface);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.confirm-actions { display: flex; gap: 12px; }
+.confirm-actions .btn { flex: 1; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  > label { font-weight: 600; font-size: 15px; }
+}
+
+input[type='text'],
+input[type='email'],
+input[type='tel'] {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--c-border);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 17px; /* ≥16px avoids iOS zoom on focus */
+  color: var(--c-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 4px rgb(90 47 214 / 15%);
+  }
+}
+
+.mono { font-variant-numeric: tabular-nums; letter-spacing: 0.06em; }
+
+.invalid input { border-color: var(--c-error); }
+.invalid input:focus { box-shadow: 0 0 0 4px rgb(179 38 30 / 15%); }
+.valid .counter { color: var(--c-success); font-weight: 800; }
+
+.affix {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 17px;
+    color: var(--c-muted);
+    pointer-events: none;
+  }
+  .prefix + input { padding-left: 52px; }
+
+  .counter {
+    position: absolute;
+    right: 14px;
+    font-size: 13px;
+    color: var(--c-muted);
+    pointer-events: none;
+  }
+  input.mono { padding-right: 56px; }
+}
+
+.error {
+  margin: 0;
+  font-size: 14px;
+  color: var(--c-error);
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
+.center { text-align: center; margin-top: -8px; }
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin: 1px 0 0;
+    accent-color: var(--c-primary);
+  }
+}

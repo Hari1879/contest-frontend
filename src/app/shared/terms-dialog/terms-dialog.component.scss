@@ -1,0 +1,95 @@
+:host {
+  --terms-backdrop: rgb(10 14 22 / 72%);
+  --terms-surface: #ffffff;
+  --terms-text: #173042;
+  --terms-muted: #627481;
+  --terms-heading: #102a43;
+  --terms-border: #d9e3e5;
+  --terms-table-head: #f4f7f6;
+  --terms-accent: #087f8c;
+  --terms-accent-text: #ffffff;
+  --terms-disabled: #b8c4c9;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--terms-backdrop);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 24px));
+  height: min(86dvh, 760px);
+  background: var(--terms-surface);
+  color: var(--terms-text);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 40%);
+}
+
+.header {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--terms-border);
+}
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--terms-accent); }
+h2 { margin: 2px 0 0; font-size: 20px; color: var(--terms-heading); }
+.close {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--terms-table-head);
+  color: var(--terms-text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 16px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.end { margin: 20px 0 0; text-align: center; font-size: 13px; color: var(--terms-muted); }
+
+.footer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--terms-border);
+  background: var(--terms-surface);
+}
+.hint { margin: 0; font-size: 13px; text-align: center; color: var(--terms-muted); }
+.agree { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; cursor: pointer; }
+.agree input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--terms-accent); }
+.agree.disabled { color: var(--terms-muted); cursor: not-allowed; }
+.accept {
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--terms-accent);
+  color: var(--terms-accent-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  &:disabled { background: var(--terms-disabled); cursor: not-allowed; }
+}

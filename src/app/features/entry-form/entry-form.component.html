@@ -1,0 +1,177 @@
+<a routerLink="/" class="back">← Back</a>
+
+<header class="intro">
+  <span class="eyebrow">Step 1 of 2</span>
+  <h1>Enter your details</h1>
+  <p class="muted">We'll use these only to validate your entry and send any reward you win.</p>
+</header>
+
+<form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.inert]="state().submitting ? '' : null">
+  @if (!confirming()) {
+  <div class="field" [class.invalid]="showError('name')">
+    <label for="f-name">Full name</label>
+    <input
+      id="f-name"
+      type="text"
+      formControlName="name"
+      autocomplete="name"
+      autocapitalize="words"
+      maxlength="50"
+      [attr.aria-invalid]="showError('name')"
+      [attr.aria-describedby]="showError('name') ? 'e-name' : null"
+    />
+    @if (showError('name')) {
+      <p class="error" id="e-name">{{ errorFor('name') }}</p>
+    }
+  </div>
+
+  <div class="field" [class.invalid]="showError('email')">
+    <label for="f-email">Email address</label>
+    <input
+      id="f-email"
+      type="email"
+      formControlName="email"
+      autocomplete="email"
+      inputmode="email"
+      autocapitalize="off"
+      spellcheck="false"
+      [attr.aria-invalid]="showError('email')"
+      [attr.aria-describedby]="showError('email') ? 'e-email' : null"
+    />
+    @if (showError('email')) {
+      <p class="error" id="e-email">{{ errorFor('email') }}</p>
+    }
+  </div>
+
+  <div class="field" [class.invalid]="showError('phone')">
+    <label for="f-phone">Mobile number</label>
+    <div class="affix">
+      <span class="prefix" aria-hidden="true">+91</span>
+      <input
+        id="f-phone"
+        type="tel"
+        formControlName="phone"
+        autocomplete="tel-national"
+        inputmode="numeric"
+        (input)="onPhoneInput(form.controls.phone)"
+        [attr.aria-invalid]="showError('phone')"
+        [attr.aria-describedby]="showError('phone') ? 'e-phone' : 'h-phone'"
+      />
+    </div>
+    @if (showError('phone')) {
+      <p class="error" id="e-phone">{{ errorFor('phone') }}</p>
+    } @else {
+      <p class="hint" id="h-phone">10-digit Indian mobile number.</p>
+    }
+  </div>
+
+  <div class="field" [class.invalid]="showError('imei')" [class.valid]="form.controls.imei.valid">
+    <label for="f-imei">IMEI number</label>
+    <div class="affix">
+      <input
+        id="f-imei"
+        type="text"
+        appImeiInput
+        formControlName="imei"
+        placeholder="35 123456 789012 3"
+        class="mono"
+        [attr.aria-invalid]="showError('imei')"
+        [attr.aria-describedby]="(showError('imei') ? 'e-imei ' : '') + 'h-imei'"
+      />
+      <span class="counter" aria-hidden="true">
+        @if (form.controls.imei.valid) { ✓ } @else { {{ imeiDigits().length }}/15 }
+      </span>
+    </div>
+    @if (showError('imei')) {
+      <p class="error" id="e-imei">{{ errorFor('imei') }}</p>
+    }
+    <p class="hint" id="h-imei">
+      Dial <strong>*#06#</strong> on your new phone, or check the sticker on its box. Dual-SIM phones
+      have two — either one works.
+    </p>
+  </div>
+
+  <div class="field terms" [class.invalid]="showError('termsAccepted')">
+    <label class="check">
+      <input
+        id="f-termsAccepted"
+        type="checkbox"
+        formControlName="termsAccepted"
+        (click)="openTerms($event)"
+        [attr.aria-invalid]="showError('termsAccepted')"
+        [attr.aria-describedby]="showError('termsAccepted') ? 'e-terms' : null"
+      />
+      <span>
+        I agree to the
+        <button type="button" class="link-btn" (click)="openTerms($event)">Terms &amp; Conditions</button>
+      </span>
+    </label>
+    @if (showError('termsAccepted')) {
+      <p class="error" id="e-terms">{{ errorFor('termsAccepted') }}</p>
+    }
+  </div>
+
+  @if (failure(); as f) {
+    <div class="alert alert-error" role="alert">
+      <div>
+        @if (f.kind === 'network_error') {
+          <p><strong>Connection problem.</strong> We couldn't reach the server. Your entry was not lost — check your connection and try again.</p>
+        } @else {
+          <p><strong>Something went wrong.</strong> Please try again in a moment.</p>
+        }
+      </div>
+    </div>
+  }
+
+  <button
+    type="submit"
+    class="btn btn-primary"
+    [disabled]="!termsChecked() || state().submitting || !network.online()"
+    [attr.aria-busy]="state().submitting"
+  >
+    @if (state().submitting) {
+      <span class="spinner" aria-hidden="true"></span> Checking your entry…
+    } @else if (failure()) {
+      Try again
+    } @else {
+      Submit &amp; reveal my result
+    }
+  </button>
+  @if (!termsChecked()) {
+    <p class="hint center">Accept the Terms &amp; Conditions to enable submit.</p>
+  }
+  } @else {
+    <section class="confirm-entry" aria-labelledby="confirm-entry-title">
+      <h2 id="confirm-entry-title">Check your IMEI:</h2>
+      <p class="mono formatted-imei">{{ formattedImei() }}</p>
+      <p>You can enter only once per device and the result is final.</p>
+
+      @if (failure(); as f) {
+        <div class="alert alert-error" role="alert">
+          @if (f.kind === 'network_error') {
+            <p><strong>Connection problem.</strong> We couldn't reach the server. Your entry was not lost — check your connection and retry.</p>
+          } @else {
+            <p><strong>Something went wrong.</strong> Please retry your submission.</p>
+          }
+        </div>
+      }
+
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-ghost" [disabled]="state().submitting" (click)="confirming.set(false)">Edit</button>
+        <button type="button" class="btn btn-primary" [disabled]="state().submitting || !network.online()" (click)="confirmAndSubmit()">
+          @if (state().submitting) {
+            <span class="spinner" aria-hidden="true"></span> Checking your result...
+          } @else if (failure()) {
+            Retry
+          } @else {
+            Confirm &amp; Submit
+          }
+        </button>
+      </div>
+    </section>
+  }
+</form>
+
+<div class="visually-hidden" aria-live="assertive" aria-atomic="true">{{ liveMessage() }}</div>
+
+<app-terms-dialog [open]="termsOpen()" (accepted)="acceptTerms($event)" (closed)="termsOpen.set(false)" />

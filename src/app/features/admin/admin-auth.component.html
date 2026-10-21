@@ -1,0 +1,73 @@
+<section class="admin-page auth-page" aria-labelledby="auth-title">
+  <div class="admin-topline">
+    <div class="workspace-mark"><span>CA</span><strong>{{ mode() === 'signup' ? 'CONTEST / ACCOUNT' : 'CONTEST / ADMIN' }}</strong></div>
+    @if (mode() !== 'signup') { <div class="access-state"><i aria-hidden="true"></i> RESTRICTED WORKSPACE</div> }
+  </div>
+
+  <div class="auth-layout">
+    <header class="auth-intro">
+      <span class="eyebrow">{{ mode() === 'signup' ? 'ACCOUNT / SIGNUP' : 'OPERATIONS / SECURE ACCESS' }}</span>
+      <h1 id="auth-title">
+        @if (mode() === 'signup') { Create your <em>account</em> }
+        @else if (mode() === 'forgot') { Recover <em>access</em> }
+        @else if (mode() === 'reset') { Set a new <em>password</em> }
+        @else { Contest <em>admin</em> }
+      </h1>
+      <p>{{ mode() === 'signup' ? 'Request an account to get started.' : 'Daily register, participant records, and payout activity.' }}</p>
+      @if (mode() !== 'signup') { <div class="access-note"><span aria-hidden="true">01</span><span>Eight-hour secure sessions</span></div> }
+    </header>
+
+    <section class="auth-panel" [attr.aria-label]="mode() === 'signup' ? 'Create account' : 'Administrator account'">
+      @if (mode() === 'login') {
+        <div class="panel-heading"><span class="eyebrow">SIGN IN</span><h2>Welcome back</h2></div>
+        @if (verified()) { <p class="notice success" role="status">Email verified. You can now sign in.</p> }
+        @if (resetComplete()) { <p class="notice success" role="status">Password updated. Sign in with your new password.</p> }
+        <form (submit)="submit($event)">
+          <label for="login-email">Email address</label>
+          <input id="login-email" type="email" autocomplete="email" [value]="email()" (input)="setEmail($event)" required />
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" [value]="password()" (input)="setPassword($event)" required />
+          <button type="submit" class="submit-button" [disabled]="loading()">{{ loading() ? 'Signing in…' : 'Sign in' }}<span aria-hidden="true">→</span></button>
+        </form>
+        <nav class="auth-links" aria-label="Account options">
+          <a routerLink="/admin/forgot-password">Forgot password?</a>
+          <a routerLink="/admin/signup">Create account</a>
+        </nav>
+      } @else if (mode() === 'signup') {
+        <div class="panel-heading"><span class="eyebrow">NEW ACCOUNT</span><h2>Create account</h2></div>
+        <form novalidate (submit)="submit($event)">
+          <label for="signup-email">Email address</label>
+          <input id="signup-email" type="email" autocomplete="email" [value]="email()" (input)="setEmail($event)" required />
+          <label for="signup-password">Password <small>12 to 72 characters</small></label>
+          <input id="signup-password" type="password" autocomplete="new-password" minlength="12" maxlength="72" [value]="password()" (input)="setPassword($event)" required />
+          <label for="signup-confirm">Confirm password</label>
+          <input id="signup-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="72" [value]="confirmPassword()" (input)="setConfirmPassword($event)" required />
+          <button type="submit" class="submit-button" [disabled]="loading()">{{ loading() ? 'Submitting…' : 'Request account' }}<span aria-hidden="true">→</span></button>
+        </form>
+      } @else if (mode() === 'forgot') {
+        <div class="panel-heading"><span class="eyebrow">PASSWORD RESET</span><h2>Find your account</h2></div>
+        <p class="panel-copy">Enter your account email. If it is verified, we will send a reset link.</p>
+        <form (submit)="submit($event)">
+          <label for="forgot-email">Email address</label>
+          <input id="forgot-email" type="email" autocomplete="email" [value]="email()" (input)="setEmail($event)" required />
+          <button type="submit" class="submit-button" [disabled]="loading()">{{ loading() ? 'Sending…' : 'Send reset link' }}<span aria-hidden="true">→</span></button>
+        </form>
+        <nav class="auth-links" aria-label="Account options"><a routerLink="/admin/login">Back to sign in</a></nav>
+      } @else {
+        <div class="panel-heading"><span class="eyebrow">PASSWORD RESET</span><h2>Choose a new password</h2></div>
+        @if (!resetToken()) { <p class="notice error" role="alert">This reset link is missing or invalid. Request a new one.</p> }
+        <form (submit)="submit($event)">
+          <label for="reset-password">New password <small>12 characters minimum</small></label>
+          <input id="reset-password" type="password" autocomplete="new-password" minlength="12" [value]="newPassword()" (input)="setNewPassword($event)" required />
+          <label for="reset-confirm">Confirm new password</label>
+          <input id="reset-confirm" type="password" autocomplete="new-password" minlength="12" [value]="confirmPassword()" (input)="setConfirmPassword($event)" required />
+          <button type="submit" class="submit-button" [disabled]="loading() || !resetToken()">{{ loading() ? 'Updating…' : 'Update password' }}<span aria-hidden="true">→</span></button>
+        </form>
+        <nav class="auth-links" aria-label="Account options"><a routerLink="/admin/forgot-password">Request another reset link</a></nav>
+      }
+
+      @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+      @if (success()) { <p class="notice success" role="status">{{ success() }}</p> }
+    </section>
+  </div>
+</section>

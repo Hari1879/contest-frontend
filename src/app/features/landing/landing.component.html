@@ -1,0 +1,47 @@
+<section class="hero">
+  <div class="hero-kicker"><span class="hero-dot" aria-hidden="true"></span> New phone? Lucky you.</div>
+  <h1>Enter. Reveal. <span class="gold">Celebrate.</span></h1>
+  <p class="hero-lede">Register your new phone for a chance to unlock an instant reward.</p>
+
+  <a class="btn btn-gold hero-cta" routerLink="/enter">Enter now <span aria-hidden="true">→</span></a>
+</section>
+
+@if (state().completed; as done) {
+  <div class="card resume" role="region" aria-label="Your existing entry">
+    @if (done.revealed) {
+      <p><strong>You've already entered with this browser.</strong> Your receipt is still available.</p>
+      <a class="btn btn-ghost" routerLink="/confirmation">View my receipt</a>
+    } @else {
+      <p><strong>Your result is waiting!</strong> You submitted an entry but haven't revealed it yet.</p>
+      <a class="btn btn-gold" routerLink="/scratch">Reveal my result</a>
+    }
+  </div>
+}
+
+<section class="card stack contest-details">
+  <div class="section-heading">
+    <span class="eyebrow">Three quick steps</span>
+    <h2>Make your new phone count</h2>
+  </div>
+  <ol class="steps">
+    <li><strong>Buy</strong> a qualifying phone at a partner store.</li>
+    <li><strong>Enter</strong> your details and the phone's 15-digit IMEI.</li>
+    <li><strong>Reveal</strong> your result instantly.</li>
+  </ol>
+
+  <div>
+    <h3 class="h3">Qualifying models</h3>
+    <ul class="models">
+      @for (m of config.qualifyingModels; track m) {
+        <li>{{ m }}</li>
+      }
+    </ul>
+  </div>
+
+  <p class="muted">Contest days: <strong>{{ config.contestDays }}</strong>. Each phone (IMEI) can be entered once.</p>
+
+  <a class="btn btn-primary" routerLink="/enter">Enter contest <span aria-hidden="true">→</span></a>
+  <p class="muted small center">
+    Tip: dial <strong>*#06#</strong> on your new phone to see its IMEI.
+  </p>
+</section>

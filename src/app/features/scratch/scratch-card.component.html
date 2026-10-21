@@ -1,0 +1,19 @@
+<div class="card-frame" [class.revealed]="isRevealed()">
+  <!-- Prize layer: hidden from assistive tech until revealed so it isn't spoiled -->
+  <div class="prize" [attr.aria-hidden]="!isRevealed()">
+    <ng-content />
+  </div>
+
+  <canvas
+    #canvas
+    class="foil"
+    role="img"
+    [attr.aria-label]="isRevealed() ? revealedLabel() : 'Your result is covered. Use the Reveal button below to see it.'"
+  ></canvas>
+</div>
+
+@if (!isRevealed()) {
+  <button type="button" class="btn btn-ghost reveal-btn" (click)="reveal()">
+    Reveal my result
+  </button>
+}

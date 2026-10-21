@@ -1,0 +1,43 @@
+<header class="a-nav">
+  <strong class="a-brand">Admin</strong>
+  <nav aria-label="Admin sections">
+    <a routerLink="/admin" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+    <a routerLink="/admin/reward-plan" routerLinkActive="on">Reward plan</a>
+    <a routerLink="/admin/models" routerLinkActive="on">Models</a>
+    <a routerLink="/admin/audit" routerLinkActive="on">Audit</a>
+  </nav>
+  <span class="a-user small muted">
+    {{ user()?.email }} @if (user(); as u) { ({{ u.role }}) }
+  </span>
+  <button type="button" class="a-btn" (click)="signOut()">Sign out</button>
+</header>
+
+<main class="a-wrap" id="admin-main">
+  <router-outlet />
+</main>
+
+<div class="a-toasts" role="status" aria-live="polite">
+  @for (t of toast.toasts(); track t.id) {
+    <div class="a-toast" [class.a-toast-error]="t.kind === 'error'">
+      <span>{{ t.message }}</span>
+      <button type="button" class="link-btn" (click)="toast.dismiss(t.id)" aria-label="Dismiss">x</button>
+    </div>
+  }
+</div>
+
+@if (conflict(); as c) {
+  <app-modal heading="This draft was changed" [dismissible]="false">
+    <p>{{ c.message }}</p>
+    @if (c.buckets.length) {
+      <ul>
+        @for (b of c.buckets; track $index) {
+          <li>{{ b.poolCode }} tier {{ b.tierNo }}, Day {{ b.dayNo }}: {{ b.claimed }} claimed, target {{ b.target }}</li>
+        }
+      </ul>
+    }
+    <p>Reload to see the latest version; unsaved edits will be lost.</p>
+    <div class="a-actions">
+      <button type="button" class="a-btn a-btn-primary" (click)="reload()">Reload</button>
+    </div>
+  </app-modal>
+}

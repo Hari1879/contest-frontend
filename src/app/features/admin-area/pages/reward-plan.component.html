@@ -1,0 +1,212 @@
+<h1>Reward plan</h1>
+
+@if (loading()) {
+  <div class="card stack" aria-busy="true" aria-label="Loading reward plan">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="a-skel"></div>
+    }
+  </div>
+} @else if (loadError()) {
+  <div class="card a-empty">
+    <p>The reward plan could not be loaded.</p>
+    <button type="button" class="a-btn a-btn-primary" (click)="load()">Retry</button>
+  </div>
+} @else if (!plan() || !totals()) {
+  <div class="card a-empty">No reward plan has been published yet.</div>
+} @else {
+  @let p = plan()!;
+  @let t = totals()!;
+  @let ro = !isAdmin();
+
+  <section class="card a-row" aria-label="Plan summary">
+    <span><strong>Plan v{{ p.version }}</strong></span>
+    <span class="a-badge" [class.a-badge-draft]="p.status === 'draft'" [class.a-badge-published]="p.status === 'published'">{{ p.status === 'draft' ? 'Draft' : p.status === 'published' ? 'Published' : 'Archived' }}</span>
+    <span>Start date: <strong>{{ p.startDate }}</strong></span>
+    @if (ro) {
+      <span class="small muted">Showing the published plan (read-only).</span>
+    }
+    @if (dirty()) {
+      <span class="a-dirty" role="status">Unsaved changes</span>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="budget-h">
+    <h2 id="budget-h">Budget</h2>
+    <div class="a-row">
+      @for (f of budgetFields; track f.key) {
+        <label class="a-field">
+          {{ f.label }}
+          <input
+            class="a-input a-yellow"
+            inputmode="numeric"
+            [value]="p[f.key]"
+            [readOnly]="ro"
+            [attr.aria-invalid]="f.key === 'totalBudget' && errorMap().has('budget') ? 'true' : null"
+            (input)="onBudget(f.key, $event)"
+          />
+          <span class="small muted">Rs {{ fmt(p[f.key]) }}</span>
+        </label>
+      }
+      <label class="a-field">
+        Available for reward distribution (Rs)
+        <input class="a-input a-readonly" readonly [value]="fmt(t.available)" />
+        @if (errorMap().get('budget'); as e) {
+          <span class="a-err" role="alert">{{ e }}</span>
+        }
+      </label>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="shares-h">
+    <h2 id="shares-h">Pool shares</h2>
+    <div class="a-row">
+      @for (pool of p.pools; track pool.poolCode; let i = $index) {
+        <label class="a-field">
+          {{ pool.poolCode }} share (%)
+          <input
+            class="a-input a-yellow"
+            inputmode="numeric"
+            [value]="pool.sharePct"
+            [readOnly]="ro"
+            [attr.aria-invalid]="errorMap().has('shares') ? 'true' : null"
+            (input)="onShare(i, $event)"
+          />
+          <span class="small muted">Pool amount: Rs {{ fmt(t.pools[i].poolAmount) }}</span>
+        </label>
+      }
+    </div>
+    @if (errorMap().get('shares'); as e) {
+      <p class="a-err" role="alert">{{ e }}</p>
+    }
+  </section>
+
+  @for (pool of p.pools; track pool.poolCode; let i = $index) {
+    <app-pool-card
+      [pool]="pool"
+      [plan]="p"
+      [totals]="t.pools[i]"
+      [today]="today()"
+      [editable]="!ro"
+      [live]="live()"
+      [errors]="errorMap()"
+      (amountChange)="setAmount(i, $event)"
+      (countChange)="setCount(i, $event)"
+      (pasteBlock)="paste(i, $event)"
+    />
+  }
+
+  @if (t.razorpayHeadroom < 0) {
+    <p class="alert a-warn" role="alert">
+      Razorpay: {{ fmt(t.winners) }} winners x Rs {{ p.razorpayTxnUnitCost }} = Rs {{ fmt2(t.razorpayCost) }}, which
+      exceeds the transaction budget of Rs {{ fmt(p.razorpayTxnBudget) }} by Rs {{ fmt2(-t.razorpayHeadroom) }}.
+    </p>
+  } @else {
+    <p class="small muted">
+      Razorpay: {{ fmt(t.winners) }} winners x Rs {{ p.razorpayTxnUnitCost }} = Rs {{ fmt2(t.razorpayCost) }} of Rs
+      {{ fmt(p.razorpayTxnBudget) }} transaction budget.
+    </p>
+  }
+
+  @if (generalErrors().length) {
+    <ul class="alert alert-error" role="alert">
+      @for (e of generalErrors(); track $index) {
+        <li>{{ e.message }}</li>
+      }
+    </ul>
+  }
+  @if (warnings().length) {
+    <ul class="alert a-warn">
+      @for (w of warnings(); track $index) {
+        <li>{{ w.message }}</li>
+      }
+    </ul>
+  }
+
+  <div class="a-actions">
+    @if (!ro) {
+      <button type="button" class="a-btn" [disabled]="busy() !== null || !dirty()" (click)="saveDraft()">
+        Save draft
+      </button>
+    }
+    <button type="button" class="a-btn" [disabled]="busy() !== null" (click)="validate()">Validate</button>
+    <button type="button" class="a-btn" [disabled]="busy() !== null" (click)="openPreview()">
+      Preview changes
+    </button>
+    <button type="button" class="a-btn a-btn-gold" [disabled]="!canPublish()" (click)="openPublish()">
+      {{ ro ? 'Approve and publish' : 'Publish' }}
+    </button>
+    @if (!canPublish()) {
+      <span class="small muted">
+        {{ ro ? 'Validate and enter the draft version to enable this.' : 'Validate and save the draft (checks must be 0) to enable this.' }}
+      </span>
+    }
+  </div>
+
+  @if (preview(); as pv) {
+    <app-modal heading="Preview changes" (closed)="preview.set(null)">
+      @for (pool of p.pools; track pool.poolCode) {
+        <h3>{{ pool.poolCode }}</h3>
+        <ul>
+          @for (c of pv.changes; track $index) {
+            @if (c.poolCode === pool.poolCode) {
+              <li>
+                Tier {{ c.tierNo }}, Day {{ c.dayNo }}:
+                @if (c.added) { <span class="a-add">+{{ c.added }} added</span> }
+                @if (c.removed) { <span class="a-rem">-{{ c.removed }} removed</span> }
+                @if (c.repriced) { {{ c.repriced }} repriced }
+              </li>
+            }
+          }
+        </ul>
+      }
+      @if (!pv.changes.length) {
+        <p class="muted">No slot changes.</p>
+      }
+      @if (pv.blocked.length) {
+        <h3>Blocked buckets</h3>
+        <ul>
+          @for (b of pv.blocked; track $index) {
+            <li class="a-err">
+              {{ b.poolCode }} tier {{ b.tierNo }} Day {{ b.dayNo }}: {{ b.reason }}
+              @if (b.claimed != null) { ({{ b.claimed }} claimed, target {{ b.target }}) }
+            </li>
+          }
+        </ul>
+      }
+      <form method="dialog" class="a-actions"><button class="a-btn">Close</button></form>
+    </app-modal>
+  }
+
+  @if (publishOpen()) {
+    <app-modal [heading]="ro ? 'Approve and publish' : 'Publish plan'" (closed)="publishOpen.set(false)">
+      <p>
+        {{ fmt(t.winners) }} winners, total payout Rs {{ fmt(totalPayout()) }}
+        @for (pt of t.pools; track pt.poolCode) {
+          ({{ pt.poolCode }} Rs {{ fmt(pt.total) }})
+        }
+      </p>
+      @if (ro) {
+        <label class="a-field">
+          Draft version to approve
+          <input class="a-input" inputmode="numeric" [value]="approveVersion()" (input)="approveVersion.set(+$any($event.target).value || 0)" />
+        </label>
+      }
+      @if (noTimeBlocked()) {
+        <label>
+          <input type="checkbox" [checked]="allowNoTime()" (change)="allowNoTime.set($any($event.target).checked)" />
+          Publish even though some days have no release time remaining
+        </label>
+      }
+      <label class="a-field">
+        Type PUBLISH to confirm
+        <input class="a-input" autocomplete="off" [value]="confirmText()" (input)="confirmText.set($any($event.target).value)" />
+      </label>
+      <div class="a-actions">
+        <button type="button" class="a-btn a-btn-primary" [disabled]="!confirmed() || busy() !== null" (click)="confirmPublish()">
+          Confirm
+        </button>
+        <form method="dialog"><button class="a-btn">Cancel</button></form>
+      </div>
+    </app-modal>
+  }
+}

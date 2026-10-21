@@ -1,0 +1,37 @@
+@if (open) {
+  <div class="backdrop" (click)="close()">
+    <div
+      class="dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="terms-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="header">
+        <div>
+          <span class="label">Vivo Week Contest</span>
+          <h2 id="terms-dialog-title">Terms &amp; Conditions</h2>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="close()">&times;</button>
+      </header>
+
+      <div #body class="body" tabindex="0" (scroll)="checkScroll()">
+        <app-terms-body />
+        <p class="end">— End of Terms &amp; Conditions —</p>
+      </div>
+
+      <footer class="footer">
+        @if (!reachedEnd) {
+          <p class="hint">Scroll to the end to accept</p>
+        }
+        <label class="agree" [class.disabled]="!reachedEnd">
+          <input type="checkbox" [disabled]="!reachedEnd" [checked]="agreed" (change)="onAgreeChange($event)" />
+          <span>I have read and agree to the Terms &amp; Conditions</span>
+        </label>
+        <button type="button" class="accept" [disabled]="!reachedEnd || !agreed" (click)="accept()">
+          Accept &amp; Continue
+        </button>
+      </footer>
+    </div>
+  </div>
+}
