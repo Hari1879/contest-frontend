@@ -14,13 +14,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { TERMS_VERSION } from '../../core/config/terms';
-import { TermsBodyComponent } from './terms-body.component';
 
 export { TERMS_VERSION };
 
 @Component({
   selector: 'app-terms-dialog',
-  imports: [TermsBodyComponent],
   templateUrl: './terms-dialog.component.html',
   styleUrl: './terms-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
