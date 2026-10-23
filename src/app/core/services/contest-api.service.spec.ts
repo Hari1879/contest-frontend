@@ -121,10 +121,30 @@ describe('ContestApiService', () => {
     expect(out[0].kind).toBe('network_error');
   });
 
-  it('treats a malformed win as a server error', () => {
+  it('never turns a 2xx win into an error, even with an unexpected amount', () => {
+    let out = call();
+    http.expectOne('/api/contest/entries').flush({ status: 'won', claimUrl: 'https://x/claim/t' });
+    expect(out[0]).toMatchObject({ kind: 'won', claimUrl: 'https://x/claim/t' });
+
+    out = call();
+    http.expectOne('/api/contest/entries').flush({ status: 'won', amount: 750, claimUrl: 'https://x/claim/t' });
+    expect(out[0]).toMatchObject({ kind: 'won', amount: 750 });
+  });
+
+  it('replays a win delivered on an error status body', () => {
     const out = call();
-    http.expectOne('/api/contest/entries').flush({ status: 'won' });
-    expect(out[0].kind).toBe('server_error');
+    http.expectOne('/api/contest/entries').flush({ status: 'won', amount: 500 }, { status: 409, statusText: 'Conflict' });
+    expect(out[0].kind).toBe('won');
+  });
+
+  it('carries the server message for 4xx and 429', () => {
+    let out = call();
+    http.expectOne('/api/contest/entries').flush({ message: 'Bad IMEI' }, { status: 400, statusText: 'Bad Request' });
+    expect(out[0]).toEqual({ kind: 'rejected', message: 'Bad IMEI' });
+
+    out = call();
+    http.expectOne('/api/contest/entries').flush({ message: 'Slow down' }, { status: 429, statusText: 'Too Many' });
+    expect(out[0]).toEqual({ kind: 'rate_limited', message: 'Slow down' });
   });
 
   it('does not retry a timed-out submission', async () => {

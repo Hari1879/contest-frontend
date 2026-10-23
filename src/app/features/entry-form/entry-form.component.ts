@@ -3,6 +3,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { EntryFormValue, EntryOutcome } from '../../core/models/contest.models';
+import { claimTokenFromUrl } from '../../core/utils/claim-url';
 import { AnalyticsService } from '../../core/services/analytics.service';
 import { EntryStateService } from '../../core/services/entry-state.service';
 import { NetworkStatusService } from '../../core/services/network-status.service';
@@ -74,6 +75,8 @@ export class EntryFormComponent {
   protected readonly submitAttempted = signal(false);
   protected readonly confirming = signal(false);
   protected readonly imeiRejected = signal(false);
+  private readonly serverMessage = signal('');
+  protected readonly failureMessage = signal('');
   protected readonly liveMessage = signal('');
   protected readonly failure = signal<EntryOutcome | null>(null);
   protected readonly imeiDigits = toSignal(this.form.controls.imei.valueChanges, { initialValue: '' });
@@ -87,9 +90,11 @@ export class EntryFormComponent {
     this.form.valueChanges.pipe(takeUntilDestroyed(inject(DestroyRef))).subscribe(() => {
       this.entry.clearSubmissionAttempt();
       this.failure.set(null);
+      this.failureMessage.set('');
       const currentImei = this.imeiDigits();
       if (currentImei !== this.lastObservedImei) {
         this.imeiRejected.set(false);
+        this.serverMessage.set('');
         this.lastObservedImei = currentImei;
       }
       this.analytics.trackOnce('form_started');
@@ -103,7 +108,7 @@ export class EntryFormComponent {
   }
 
   protected errorFor(name: FieldName): string {
-    if (name === 'imei' && this.imeiRejected()) return MESSAGES.imei['server'];
+    if (name === 'imei' && this.imeiRejected()) return this.serverMessage() || MESSAGES.imei['server'];
     const errors = this.form.controls[name].errors;
     if (!errors) return '';
     const key = Object.keys(errors)[0];
@@ -139,10 +144,11 @@ export class EntryFormComponent {
     if (this.state().submitting) return; // guard against double submit
     this.submitAttempted.set(true);
     this.failure.set(null);
+    this.failureMessage.set('');
     this.form.markAllAsTouched();
 
     if (this.imeiRejected()) {
-      this.announce(MESSAGES.imei['server']);
+      this.announce(this.errorFor('imei'));
       this.focus('imei');
       return;
     }
@@ -159,6 +165,7 @@ export class EntryFormComponent {
   protected confirmAndSubmit(): void {
     if (this.state().submitting) return;
     this.failure.set(null);
+    this.failureMessage.set('');
     if (!this.network.online()) {
       this.failure.set({ kind: 'network_error' });
       this.announce('You appear to be offline. Connect to the internet and try again.');
@@ -175,12 +182,21 @@ export class EntryFormComponent {
 
   private handle(outcome: EntryOutcome): void {
     switch (outcome.kind) {
-      case 'won':
+      case 'won': {
+        const token = claimTokenFromUrl(outcome.claimUrl);
+        if (!token) {
+          this.confirming.set(false);
+          this.failure.set(outcome);
+          this.failureMessage.set(
+            'Congratulations, you won! We could not open your claim page automatically. Please contact the store with your entry details.',
+          );
+          this.announce(this.failureMessage());
+          return;
+        }
         this.form.reset(); // drop PII from memory as soon as it's no longer needed
-        void this.router.navigateByUrl(`/claim/${encodeURIComponent(this.claimToken(outcome.claimUrl ?? ''))}`, {
-          replaceUrl: true,
-        });
+        void this.router.navigate(['/claim', token], { replaceUrl: true });
         return;
+      }
       case 'not_won':
       case 'duplicate':
       case 'campaign_closed':
@@ -188,29 +204,24 @@ export class EntryFormComponent {
         void this.router.navigateByUrl('/status');
         return;
       case 'rejected': {
+        this.serverMessage.set(outcome.message ?? '');
         this.imeiRejected.set(true);
         this.confirming.set(false);
-        this.announce(MESSAGES.imei['server']);
+        this.announce(this.errorFor('imei'));
         this.focus('imei');
         return;
       }
       default:
         this.failure.set(outcome);
+        if (outcome.kind === 'rate_limited') {
+          this.failureMessage.set(outcome.message || 'Too many attempts. Please wait a moment and try again.');
+        }
         this.announce(
-          outcome.kind === 'network_error'
-            ? 'We couldn’t reach the server. Check your connection and try again.'
-            : 'Something went wrong on our side. Please try again.',
+          this.failureMessage() ||
+            (outcome.kind === 'network_error'
+              ? 'We couldn’t reach the server. Check your connection and try again.'
+              : 'Something went wrong on our side. Please try again.'),
         );
-    }
-  }
-
-  private claimToken(claimUrl: string): string {
-    try {
-      const url = new URL(claimUrl, window.location.origin);
-      const match = url.pathname.match(/\/claim\/([^/]+)\/?$/);
-      return match ? decodeURIComponent(match[1]) : claimUrl.trim();
-    } catch {
-      return claimUrl.trim();
     }
   }
 

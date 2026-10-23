@@ -95,7 +95,7 @@ export class EntryStateService {
           this.patch({ completed, lastOutcome: null });
         } else {
           // Business rejections are final for this payload → fresh key next time.
-          if (outcome.kind !== 'network_error' && outcome.kind !== 'server_error') {
+          if (!['network_error', 'server_error', 'rate_limited'].includes(outcome.kind)) {
             this.idempotency = null;
           }
           this.patch({ lastOutcome: outcome });

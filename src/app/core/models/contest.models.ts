@@ -67,6 +67,7 @@ export type EntryOutcome =
   | { kind: 'rejected'; message?: string }
   | { kind: 'campaign_closed'; message?: string }
   | { kind: 'model_not_eligible'; message?: string }
+  | { kind: 'rate_limited'; message?: string }
   | { kind: 'network_error'; message?: string }
   | { kind: 'server_error'; message?: string };
 

@@ -30,6 +30,7 @@ export class ContestApiService {
     return this.http
       .get<ClaimStatusResponse>(`${this.apiBaseUrl}/contest/claims/${encodeURIComponent(token)}`, {
         headers: this.config.appKey ? { 'x-app-key': this.config.appKey } : {},
+        cache: 'no-store',
       })
       .pipe(timeout(this.config.requestTimeoutMs));
   }
@@ -39,7 +40,7 @@ export class ContestApiService {
       .post<ClaimStatusResponse>(
         `${this.apiBaseUrl}/contest/claims/${encodeURIComponent(token)}/new-link`,
         {},
-        { headers: this.config.appKey ? { 'x-app-key': this.config.appKey } : {} },
+        { headers: this.config.appKey ? { 'x-app-key': this.config.appKey } : {}, cache: 'no-store' },
       )
       .pipe(timeout(this.config.requestTimeoutMs));
   }
@@ -96,13 +97,11 @@ export class ContestApiService {
     const message = res.message || undefined;
     switch (res.status) {
       case 'won': {
+        // A 2xx win is never downgraded to an error; the claim page shows the authoritative amount.
         const amount = Number(res.amount);
-        if (![500, 1000, 2000, 8000].includes(amount)) {
-          return { kind: 'server_error' };
-        }
         return {
           kind: 'won',
-          amount,
+          amount: Number.isFinite(amount) ? amount : 0,
           tier: res.tier,
           referenceId: res.referenceId,
           claimUrl: res.claimUrl,
@@ -131,8 +130,10 @@ export class ContestApiService {
         if (mapped.kind !== 'server_error') return mapped;
       }
       if (err.status === 0) return { kind: 'network_error' };
-      if (err.status === 409) return { kind: 'duplicate' };
-      if (err.status === 400 || err.status === 422) return { kind: 'rejected' };
+      const message = typeof body?.message === 'string' && body.message ? body.message : undefined;
+      if (err.status === 409) return { kind: 'duplicate', message };
+      if (err.status === 429) return { kind: 'rate_limited', message };
+      if (err.status >= 400 && err.status < 500) return { kind: 'rejected', message };
       return { kind: 'server_error' };
     }
     return { kind: 'server_error' };

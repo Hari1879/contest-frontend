@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EntryState } from '../../core/services/entry-state.service';
@@ -78,5 +78,39 @@ describe('EntryFormComponent', () => {
     expect(submit).toHaveBeenCalledOnce();
     expect(fixture.nativeElement.textContent).toContain('This IMEI wasn’t accepted.');
     expect(fixture.nativeElement.textContent).not.toContain('This device has already been entered.');
+  });
+
+  function confirm(): void {
+    enterValidDetails();
+    (fixture.componentInstance as unknown as { submit(): void }).submit();
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.confirm-actions .btn-primary') as HTMLButtonElement).click();
+    fixture.detectChanges();
+  }
+
+  it('navigates a win to /claim/:token with replaceUrl', () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    submit.mockReturnValue(of({ kind: 'won', amount: 500, claimUrl: `${window.location.origin}/claim/tok123` }));
+    confirm();
+
+    expect(navigate).toHaveBeenCalledWith(['/claim', 'tok123'], { replaceUrl: true });
+  });
+
+  it('rejects a foreign-origin claimUrl with a safe error and no navigation', () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    submit.mockReturnValue(of({ kind: 'won', amount: 500, claimUrl: 'https://evil.example/claim/tok123' }));
+    confirm();
+
+    expect(navigate).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).not.toContain('Something went wrong');
+    expect(fixture.nativeElement.textContent).toContain('could not open your claim page');
+  });
+
+  it('shows the server message for a 4xx rejection', () => {
+    submit.mockReturnValue(of({ kind: 'rejected', message: 'IMEI is blacklisted.' }));
+    confirm();
+
+    expect(fixture.nativeElement.textContent).toContain('IMEI is blacklisted.');
+    expect(fixture.nativeElement.textContent).not.toContain('This IMEI wasn’t accepted.');
   });
 });

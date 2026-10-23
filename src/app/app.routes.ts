@@ -27,10 +27,8 @@ export const routes: Routes = [
   },
   {
     path: 'claim/:token',
-    canActivate: [scratchGuard],
     title: 'Claim your reward',
-    loadComponent: () =>
-      import('./features/scratch/scratch-page.component').then((m) => m.ScratchPageComponent),
+    loadComponent: () => import('./features/claim/claim.component').then((m) => m.ClaimComponent),
   },
   {
     path: 'confirmation',
