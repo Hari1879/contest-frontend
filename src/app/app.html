@@ -2,12 +2,20 @@
 
 <header class="app-header">
   <a routerLink="/" class="brand" aria-label="{{ config.title }} — home">
+    <span class="landing-brand" aria-label="vivo">vivo</span>
     <span class="brand-text">
       <img class="brand-logo brand-logo-dark-bg" src="vfest-logo-light.png" alt="V-FEST" width="88" height="15" />
       <img class="brand-logo brand-logo-light-bg" src="vfest-logo.png" alt="V-FEST" width="88" height="15" />
       <small>{{ config.retailerName }}</small>
     </span>
   </a>
+  <nav class="landing-nav" aria-label="Main navigation">
+    <a href="#how-to">How to Participate</a>
+    <a href="#models">Qualifying Models</a>
+    <a href="#prizes">Prizes</a>
+    <a href="#contest-info">FAQs</a>
+  </nav>
+  <a class="landing-header-cta" routerLink="/enter">Enter Now <span aria-hidden="true">→</span></a>
 </header>
 
 @if (!network.online()) {

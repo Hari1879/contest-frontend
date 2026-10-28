@@ -1,9 +1,20 @@
 <section class="hero">
-  <div class="hero-kicker"><span class="hero-dot" aria-hidden="true"></span> New phone? Lucky you.</div>
-  <h1>Enter. Reveal. <span class="gold">Celebrate.</span></h1>
-  <p class="hero-lede">Participate in V-Fest contest and stand a chance to win exciting cashbacks</p>
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-kicker"><span class="hero-dot" aria-hidden="true"></span> V-Fest contest</div>
+      <h1>Enter. Reveal.<br /><span class="gold">Celebrate.</span></h1>
+      <p class="hero-lede">Participate in V-Fest contest and stand a chance to win exciting cashbacks and rewards.</p>
+      <a class="btn btn-gold hero-cta" routerLink="/enter">Enter now <span aria-hidden="true">→</span></a>
+    </div>
 
-  <a class="btn btn-gold hero-cta" routerLink=  "/enter">Enter now <span aria-hidden="true">→</span></a>
+    <div class="phone-scene" aria-hidden="true">
+      <span class="gold-orbit orbit-one"></span>
+      <span class="gold-orbit orbit-two"></span>
+      <span class="phone phone-light"><i></i><b></b></span>
+      <span class="phone phone-blue"><i></i><b></b></span>
+      <span class="phone phone-pink"><i></i><b></b></span>
+    </div>
+  </div>
 </section>
 
 @if (state().completed; as done) {
@@ -18,30 +29,73 @@
   </div>
 }
 
-<section class="card stack contest-details">
+<section id="how-to" class="content-section">
   <div class="section-heading">
     <span class="eyebrow">Three quick steps</span>
     <h2>Make your new phone count</h2>
+    <span class="heading-rule" aria-hidden="true"></span>
   </div>
   <ol class="steps">
-    <li><strong>Buy</strong> a qualifying phone at a partner store.</li>
-    <li><strong>Enter</strong> your details and the phone's 15-digit IMEI.</li>
-    <li><strong>Reveal</strong> your result instantly.</li>
+    <li>
+      <span class="step-number">1</span>
+      <span class="step-icon bag-icon" aria-hidden="true"></span>
+      <strong>Buy a qualifying phone</strong>
+      <span>at a partner store.</span>
+    </li>
+    <li>
+      <span class="step-number">2</span>
+      <span class="imei-icon" aria-hidden="true">IMEI <i>✓</i></span>
+      <strong>Enter your details</strong>
+      <span>and the phone's 15-digit IMEI.</span>
+    </li>
+    <li>
+      <span class="step-number">3</span>
+      <span class="gift-icon" aria-hidden="true">✦</span>
+      <strong>Reveal your result</strong>
+      <span>instantly.</span>
+    </li>
   </ol>
+</section>
 
-  <div>
-    <h3 class="h3">Qualifying models</h3>
-    <ul class="models">
-      @for (m of config.qualifyingModels; track m) {
-        <li>{{ m }}</li>
-      }
-    </ul>
+<section id="models" class="content-section models-section">
+  <div class="section-heading">
+    <span class="eyebrow">Qualifying models</span>
+    <h2>Eligible vivo smartphones</h2>
+    <span class="heading-rule" aria-hidden="true"></span>
   </div>
+  <ul class="models">
+    @for (m of config.qualifyingModels; track m; let i = $index) {
+      <li class="model-card">
+        <span class="model-phone" [class.model-phone-blue]="i % 3 === 1" [class.model-phone-pink]="i % 3 === 2" aria-hidden="true">
+          <i></i>
+        </span>
+        <strong>vivo {{ m }}</strong>
+        <span>Qualifying model</span>
+      </li>
+    }
+  </ul>
+</section>
 
-  <p class="muted">Contest days: <strong>{{ config.contestDays }}</strong>. Each phone (IMEI) can be entered once.</p>
+<section id="prizes" class="rewards-banner">
+  <div class="rewards-copy">
+    <span class="eyebrow">Exciting rewards</span>
+    <h2>Win assured<br />cashbacks &amp; more</h2>
+    <span class="heading-rule" aria-hidden="true"></span>
+    <p>Stand a chance to win exciting cashbacks, gift vouchers and special rewards.</p>
+  </div>
+  <div class="rewards-art" aria-hidden="true">
+    <span class="reward-ticket ticket-cashback">₹ &nbsp; CASHBACK</span>
+    <span class="reward-ticket ticket-gift">✧ &nbsp; GIFT VOUCHER</span>
+    <span class="reward-ticket ticket-special">★ &nbsp; SPECIAL REWARDS</span>
+    <span class="reward-box"><i></i></span>
+    <span class="reward-coin coin-one">₹</span>
+    <span class="reward-coin coin-two">₹</span>
+  </div>
+</section>
 
-  <a class="btn btn-primary" routerLink="/enter">Enter contest <span aria-hidden="true">→</span></a>
-  <p class="muted small center">
-    Tip: dial <strong>*#06#</strong> on your new phone to see its IMEI.
-  </p>
+<section id="contest-info" class="final-cta">
+  <h2>Ready to participate?</h2>
+  <p>Enter now and check if you're a lucky winner.</p>
+  <a class="btn btn-gold" routerLink="/enter">Enter now <span aria-hidden="true">→</span></a>
+  <p class="contest-note">Contest days: <strong>{{ config.contestDays }}</strong>. Each phone (IMEI) can be entered once.<br />Tip: dial <strong>*#06#</strong> on your new phone to see its IMEI.</p>
 </section>

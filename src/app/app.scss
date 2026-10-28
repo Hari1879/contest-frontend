@@ -75,3 +75,67 @@
   text-align: center;
   color: var(--c-muted);
 }
+
+.landing-brand, .landing-nav, .landing-header-cta { display: none; }
+
+:host:has(app-landing) {
+  .app-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 12px max(24px, calc((100vw - 1180px) / 2));
+    background: #062544;
+  }
+
+  .brand { flex: 0 0 auto; }
+  .brand-text { display: none; }
+  .landing-brand {
+    display: inline-block;
+    color: #fff;
+    font: 800 27px/1 'Avenir Next', Avenir, sans-serif;
+    letter-spacing: -0.08em;
+  }
+
+  .landing-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 3vw, 36px);
+    flex: 1;
+    a { color: rgb(255 255 255 / 84%); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    a:hover, a:focus-visible { color: var(--c-gold); }
+  }
+
+  .landing-header-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 20px;
+    border-radius: 12px;
+    background: var(--c-gold);
+    color: #082744;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .app-main { max-width: none; padding: 0 0 34px; }
+  .app-footer {
+    background: #062544;
+    color: rgb(255 255 255 / 76%);
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 700px) {
+  :host:has(app-landing) {
+    .app-header { gap: 14px; padding-right: 16px; padding-left: 16px; }
+    .landing-nav { justify-content: flex-end; gap: 12px; }
+    .landing-nav a { font-size: 11px; }
+    .landing-nav a:nth-child(2), .landing-nav a:nth-child(4) { display: none; }
+    .landing-header-cta { min-height: 38px; padding: 0 12px; font-size: 12px; }
+  }
+}
