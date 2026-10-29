@@ -76,7 +76,7 @@
   color: var(--c-muted);
 }
 
-.landing-brand, .landing-nav, .landing-header-cta { display: none; }
+.landing-nav, .landing-header-cta { display: none; }
 
 :host:has(app-landing) {
   .app-header {
@@ -88,14 +88,6 @@
   }
 
   .brand { flex: 0 0 auto; }
-  .brand-text { display: none; }
-  .landing-brand {
-    display: inline-block;
-    color: #fff;
-    font: 800 27px/1 'Avenir Next', Avenir, sans-serif;
-    letter-spacing: -0.08em;
-  }
-
   .landing-nav {
     display: flex;
     align-items: center;

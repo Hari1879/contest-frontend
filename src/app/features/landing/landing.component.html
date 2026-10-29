@@ -7,13 +7,6 @@
       <a class="btn btn-gold hero-cta" routerLink="/enter">Enter now <span aria-hidden="true">→</span></a>
     </div>
 
-    <div class="phone-scene" aria-hidden="true">
-      <span class="gold-orbit orbit-one"></span>
-      <span class="gold-orbit orbit-two"></span>
-      <span class="phone phone-light"><i></i><b></b></span>
-      <span class="phone phone-blue"><i></i><b></b></span>
-      <span class="phone phone-pink"><i></i><b></b></span>
-    </div>
   </div>
 </section>
 
@@ -60,37 +53,21 @@
 <section id="models" class="content-section models-section">
   <div class="section-heading">
     <span class="eyebrow">Qualifying models</span>
-    <h2>Eligible vivo smartphones</h2>
+    <h2>Eligible smartphones</h2>
     <span class="heading-rule" aria-hidden="true"></span>
   </div>
   <ul class="models">
-    @for (m of config.qualifyingModels; track m; let i = $index) {
-      <li class="model-card">
-        <span class="model-phone" [class.model-phone-blue]="i % 3 === 1" [class.model-phone-pink]="i % 3 === 2" aria-hidden="true">
-          <i></i>
-        </span>
-        <strong>vivo {{ m }}</strong>
-        <span>Qualifying model</span>
-      </li>
-    }
+    <li class="model-card">
+      <img class="model-image" src="models/y11.png" alt="Y11 smartphone" width="94" height="188" loading="lazy" />
+      <strong>Y11</strong>
+      <span>Qualifying model</span>
+    </li>
+    <li class="model-card">
+      <img class="model-image" src="models/y21.png" alt="Y21 smartphone" width="94" height="188" loading="lazy" />
+      <strong>Y21</strong>
+      <span>Qualifying model</span>
+    </li>
   </ul>
-</section>
-
-<section id="prizes" class="rewards-banner">
-  <div class="rewards-copy">
-    <span class="eyebrow">Exciting rewards</span>
-    <h2>Win assured<br />cashbacks &amp; more</h2>
-    <span class="heading-rule" aria-hidden="true"></span>
-    <p>Stand a chance to win exciting cashbacks, gift vouchers and special rewards.</p>
-  </div>
-  <div class="rewards-art" aria-hidden="true">
-    <span class="reward-ticket ticket-cashback">₹ &nbsp; CASHBACK</span>
-    <span class="reward-ticket ticket-gift">✧ &nbsp; GIFT VOUCHER</span>
-    <span class="reward-ticket ticket-special">★ &nbsp; SPECIAL REWARDS</span>
-    <span class="reward-box"><i></i></span>
-    <span class="reward-coin coin-one">₹</span>
-    <span class="reward-coin coin-two">₹</span>
-  </div>
 </section>
 
 <section id="contest-info" class="final-cta">

@@ -171,16 +171,6 @@ a { color: var(--c-primary); }
 /* Keep focused/scrolled-to fields clear of the sticky header */
 input, button, [id] { scroll-margin-top: 88px; }
 
-app-landing .phone-scene { position: absolute; top: 0; right: 3%; bottom: 0; width: 51%; }
-app-landing .gold-orbit { position: absolute; right: -4%; bottom: -34%; width: 79%; aspect-ratio: 1; border: 20px solid #e6a71d; border-left-color: transparent; border-radius: 50%; transform: rotate(-32deg); box-shadow: 0 0 28px rgb(244 180 26 / 20%); animation: orbit-turn 22s linear infinite; }
-app-landing .orbit-two { right: 16%; bottom: -46%; width: 82%; border-width: 7px; opacity: .8; transform: rotate(28deg); }
-app-landing .phone { position: absolute; bottom: -8%; width: 24%; height: 76%; border: 5px solid rgb(255 255 255 / 65%); border-radius: 25px; box-shadow: 0 18px 34px rgb(0 0 0 / 35%), inset 0 0 0 2px rgb(0 0 0 / 16%); }
-app-landing .phone::before { position: absolute; top: 6%; left: 7%; width: 40%; aspect-ratio: 1; border: 5px solid rgb(255 255 255 / 45%); border-radius: 50%; background: radial-gradient(circle at 50% 50%, #09121c 0 30%, #2f4457 32% 53%, #111a23 56%); content: ''; }
-app-landing .phone i, app-landing .phone b { position: absolute; top: 8%; left: 9%; width: 12%; aspect-ratio: 1; border-radius: 50%; background: #0b1825; box-shadow: 0 0 0 2px rgb(255 255 255 / 45%); }
-app-landing .phone b { top: 23%; }
-app-landing .phone-light { left: 15%; z-index: 1; height: 59%; background: linear-gradient(115deg, #fff5e7, #c8bba7); transform: rotate(-12deg); animation: phone-light-float 5s ease-in-out infinite; }
-app-landing .phone-blue { left: 39%; z-index: 2; background: linear-gradient(115deg, #5c91c5, #13385f 70%); animation: phone-blue-float 5.6s ease-in-out .35s infinite; }
-app-landing .phone-pink { left: 64%; z-index: 1; height: 69%; background: linear-gradient(115deg, #ffe2de, #be8584); transform: rotate(10deg); animation: phone-pink-float 5.2s ease-in-out .7s infinite; }
 
 app-landing .bag-icon { position: relative; width: 46px; height: 40px; margin-top: 8px; border-radius: 5px 5px 10px 10px; background: linear-gradient(135deg, #2c83d5, #0d4c91); }
 app-landing .bag-icon::before { position: absolute; top: -11px; left: 12px; width: 19px; height: 15px; border: 3px solid #9bb9d6; border-bottom: 0; border-radius: 10px 10px 0 0; content: ''; }
@@ -189,66 +179,11 @@ app-landing .imei-icon::after { position: absolute; right: 5px; bottom: 10px; le
 app-landing .imei-icon i { position: absolute; right: -11px; bottom: -5px; z-index: 1; display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; background: var(--c-gold); color: #fff; font-style: normal; }
 app-landing .gift-icon { display: grid; width: 48px; height: 42px; place-items: center; margin-top: 8px; border-radius: 8px; background: linear-gradient(140deg, #f8c943, #c88610); color: white; font-size: 29px; box-shadow: inset 0 0 0 6px rgb(255 255 255 / 30%); }
 
-app-landing .model-phone { position: relative; display: block; width: 54px; height: 100px; border: 3px solid #d5c6b0; border-radius: 10px; background: linear-gradient(110deg, #f9e8d0, #c4b397); box-shadow: 0 7px 14px rgb(16 42 67 / 15%); }
-app-landing .model-phone::before { position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border: 4px solid rgb(255 255 255 / 75%); border-radius: 50%; background: radial-gradient(circle, #152333 0 48%, #344d62 52%); content: ''; }
-app-landing .model-phone-blue { border-color: #4878a6; background: linear-gradient(110deg, #5786b5, #142f51); }
-app-landing .model-phone-pink { border-color: #d1a5a2; background: linear-gradient(110deg, #f3d4d0, #ba8584); }
-
-app-landing .rewards-art { position: absolute; top: 0; right: 0; bottom: 0; width: 50%; }
-app-landing .reward-ticket { position: absolute; z-index: 2; padding: 12px 16px; border-radius: 8px; box-shadow: 0 8px 18px rgb(0 0 0 / 20%); font-size: 12px; font-weight: 900; transform: rotate(-15deg); }
-app-landing .ticket-cashback { top: 16%; left: 21%; background: #fff1d2; color: #99680a; }
-app-landing .ticket-gift { top: 20%; right: 7%; background: #163656; color: white; transform: rotate(13deg); }
-app-landing .ticket-special { right: 23%; bottom: 16%; background: #1672cb; color: white; transform: rotate(7deg); }
-app-landing .reward-box { position: absolute; right: 24%; bottom: -15%; width: 125px; height: 120px; background: linear-gradient(90deg, #0755a4 0 42%, #1679d2 43% 100%); transform: perspective(170px) rotateX(-8deg) rotateY(-12deg); }
-app-landing .reward-box::before { position: absolute; top: -13px; left: -7px; width: 139px; height: 22px; background: #f3bc2d; content: ''; }
-app-landing .reward-box::after { position: absolute; top: -35px; left: 48px; width: 32px; height: 28px; border: 7px solid #f3bc2d; border-radius: 50% 50% 0 50%; transform: rotate(42deg); content: ''; }
-app-landing .reward-box i { position: absolute; top: 0; bottom: 0; left: 47%; width: 12px; background: #f5ca45; }
-app-landing .reward-coin { position: absolute; display: grid; width: 30px; height: 30px; place-items: center; border: 4px solid #d68a08; border-radius: 50%; background: #ffce42; color: #a16000; font-weight: 900; }
-app-landing .coin-one { top: 47%; left: 5%; animation: coin-bob 3.2s ease-in-out infinite; }
-app-landing .coin-two { right: 7%; bottom: 15%; animation: coin-bob 3.2s ease-in-out 1s infinite; }
-
-@media (max-width: 700px) {
-  app-landing .phone-scene { top: auto; right: 1%; bottom: 0; width: 56%; height: 55%; }
-  app-landing .phone { height: 95%; }
-  app-landing .phone-light { height: 80%; }
-  app-landing .phone-pink { height: 86%; }
-  app-landing .rewards-art { top: auto; width: 70%; height: 57%; }
-  app-landing .ticket-cashback { top: 2%; left: 8%; }
-  app-landing .ticket-gift { top: 5%; right: 1%; }
-  app-landing .ticket-special { right: 12%; bottom: 4%; }
-  app-landing .reward-box { right: 25%; bottom: -34%; }
-}
-
 @media (max-width: 430px) {
-  app-landing .phone-scene { width: 67%; height: 48%; }
   app-landing .bag-icon { transform: scale(.85); }
 }
 
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes phone-light-float {
-  50% { transform: translateY(-10px) rotate(-12deg); }
-}
-
-@keyframes phone-blue-float {
-  50% { transform: translateY(-13px); }
-}
-
-@keyframes phone-pink-float {
-  50% { transform: translateY(-8px) rotate(10deg); }
-}
-
-@keyframes orbit-turn { to { rotate: 360deg; } }
-@keyframes coin-bob { 50% { transform: translateY(-8px) rotate(12deg); } }
-
-@media (prefers-reduced-motion: reduce) {
-  app-landing .phone-light,
-  app-landing .phone-blue,
-  app-landing .phone-pink,
-  app-landing .gold-orbit,
-  app-landing .coin-one,
-  app-landing .coin-two { animation: none; }
 }
